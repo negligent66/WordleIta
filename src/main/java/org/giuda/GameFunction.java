@@ -34,8 +34,8 @@ public class GameFunction {
         String secret = words.get(new Random().nextInt(words.size())).toLowerCase();
 
         // Chiedi il numero di tentativi
-        int attempts = 0;
-        while (attempts <= 0) {
+        int attempts = -1;
+        while (attempts < 0) {
             System.out.print("Quanti tentativi vuoi? (0 per infiniti): ");
             attempts = scanner.nextInt();
             scanner.nextLine();
@@ -92,29 +92,33 @@ public class GameFunction {
     // Restituisce feedback stile Wordle: [G]iusta, [S]bagliata, [P]resente
     private String getFeedback(String secret, String guess) {
         char[] feedback = new char[secret.length()];
-        boolean[] used = new boolean[secret.length()];
+        boolean[] secretUsed = new boolean[secret.length()];
+        boolean[] guessUsed = new boolean[secret.length()];
 
-        // Prima passata: lettere giuste al posto giusto
+        // Prima passata: verifica lettere corrette nella posizione corretta (verde)
         for (int i = 0; i < secret.length(); i++) {
             if (guess.charAt(i) == secret.charAt(i)) {
-                feedback[i] = 'G'; // Giusta
-                used[i] = true;
+                feedback[i] = 'G'; // Verde
+                secretUsed[i] = true;
+                guessUsed[i] = true;
             }
         }
-        // Seconda passata: lettere presenti ma al posto sbagliato
+
+        // Seconda passata: verifica lettere presenti ma posizioni sbagliate (giallo)
         for (int i = 0; i < secret.length(); i++) {
-            if (feedback[i] == 0) {
+            if (!guessUsed[i]) { // solo lettere non ancora usate
                 boolean found = false;
                 for (int j = 0; j < secret.length(); j++) {
-                    if (!used[j] && guess.charAt(i) == secret.charAt(j)) {
+                    if (!secretUsed[j] && guess.charAt(i) == secret.charAt(j)) {
                         found = true;
-                        used[j] = true;
+                        secretUsed[j] = true;
                         break;
                     }
                 }
-                feedback[i] = found ? 'P' : 'S'; // Presente o Sbagliata
+                feedback[i] = found ? 'Y' : 'W'; // Giallo o Bianco
             }
         }
         return new String(feedback);
     }
+
 }
