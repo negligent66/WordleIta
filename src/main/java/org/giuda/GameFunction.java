@@ -125,6 +125,9 @@ public class GameFunction {
 
         return new String(feedback);
     }
-
+    public static void main(String[] args) {
+        GameFunction game = new GameFunction();
+        game.startGame();
+    }
 
 }
