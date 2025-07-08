@@ -69,7 +69,7 @@ public class GameFunction {
             tries++;
         }
         if (!guessed) {
-            System.out.println("Hai perso! La parola era: " + secret);
+            System.out.println("Negraccio hai perso! La parola era: " + secret);
         }
     }
 
