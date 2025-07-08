@@ -10,3 +10,4 @@ e l'altro utilizzato per inserire la parola per tentare la fortuna, quando si pr
 quando premo continua dovrebbe portare quella parola sullo slot per i risultati precedenti, il che lo fa, ma dovrebbe cancellare le parole dell'altro slot,
 ma non lo fa.
 2. nella modalità classica le caselle si colorano di bianco ogni volta e basta.
+3. non tanto un problema, ma non ho controllato cosa succede alla fine se si fallisce o si vince.
