@@ -95,18 +95,18 @@ public class GameFunction {
         boolean[] secretUsed = new boolean[secret.length()];
         boolean[] guessUsed = new boolean[secret.length()];
 
-        // Prima passata: verifica lettere corrette nella posizione corretta (verde)
+        // Verde
         for (int i = 0; i < secret.length(); i++) {
             if (guess.charAt(i) == secret.charAt(i)) {
-                feedback[i] = 'G'; // Verde
+                feedback[i] = 'G';
                 secretUsed[i] = true;
                 guessUsed[i] = true;
             }
         }
 
-        // Seconda passata: verifica lettere presenti ma posizioni sbagliate (giallo)
+        // Giallo o bianco
         for (int i = 0; i < secret.length(); i++) {
-            if (!guessUsed[i]) { // solo lettere non ancora usate
+            if (!guessUsed[i]) {
                 boolean found = false;
                 for (int j = 0; j < secret.length(); j++) {
                     if (!secretUsed[j] && guess.charAt(i) == secret.charAt(j)) {
@@ -115,10 +115,16 @@ public class GameFunction {
                         break;
                     }
                 }
-                feedback[i] = found ? 'Y' : 'W'; // Giallo o Bianco
+                if (!found) {
+                    feedback[i] = 'W'; // Bianco
+                } else {
+                    feedback[i] = 'Y'; // Giallo
+                }
             }
         }
+
         return new String(feedback);
     }
+
 
 }
