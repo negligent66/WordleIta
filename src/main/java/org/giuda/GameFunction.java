@@ -35,8 +35,8 @@ public class GameFunction {
 
         // Chiedi il numero di tentativi
         int attempts = -1;
-        while (attempts < 0) {
-            System.out.print("Quanti tentativi vuoi? (0 per infiniti): ");
+        while (attempts != 0 && attempts != 6) {
+            System.out.print("modalità infinita(0) o classica(6): ");
             attempts = scanner.nextInt();
             scanner.nextLine();
         }
