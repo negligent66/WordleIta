@@ -73,7 +73,7 @@ public class GameFunction {
         }
     }
 
-    private List<String> loadWords(int length) {
+    List<String> loadWords(int length) {
         List<String> result = new ArrayList<>();
         try (BufferedReader br = Files.newBufferedReader(Paths.get(WORDS_FILE))) {
             String line;
@@ -90,7 +90,7 @@ public class GameFunction {
     }
 
     // Restituisce feedback stile Wordle: [G]iusta, [S]bagliata, [P]resente
-    private String getFeedback(String secret, String guess) {
+    String getFeedback(String secret, String guess) {
         char[] feedback = new char[secret.length()];
         boolean[] secretUsed = new boolean[secret.length()];
         boolean[] guessUsed = new boolean[secret.length()];
