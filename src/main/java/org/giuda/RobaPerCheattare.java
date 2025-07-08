@@ -28,14 +28,22 @@ public class RobaPerCheattare {
                         char c = parola.charAt(i);
                         char v = voc.charAt(i);
                         char col = colori.charAt(i);
-                        if (col == 'V') {
+                        if (col == 'G') { // Verde: deve essere uguale e in posizione giusta
                             if (v != c) { ok = false; break; }
-                            usate.add(c);
-                        } else if (col == 'G') {
+                        } else if (col == 'Y') { // Giallo: deve essere presente ma NON in quella posizione
                             if (v == c || !voc.contains(String.valueOf(c))) { ok = false; break; }
-                            usate.add(c);
-                        } else if (col == 'W') {
-                            if (voc.contains(String.valueOf(c)) && !usate.contains(c)) { ok = false; break; }
+                        }
+                    }
+                    // Controllo lettere grigie (W): non devono apparire più volte di quante sono verdi/gialle
+                    for (int i = 0; i < parola.length(); i++) {
+                        char c = parola.charAt(i);
+                        if (colori.charAt(i) == 'W') {
+                            int occorrenzeVerdeGiallo = 0, occorrenzeVoc = 0;
+                            for (int j = 0; j < parola.length(); j++) {
+                                if (parola.charAt(j) == c && (colori.charAt(j) == 'G' || colori.charAt(j) == 'Y')) occorrenzeVerdeGiallo++;
+                                if (voc.charAt(j) == c) occorrenzeVoc++;
+                            }
+                            if (occorrenzeVoc > occorrenzeVerdeGiallo) { ok = false; break; }
                         }
                     }
                     if (ok) possibili.add(voc);
