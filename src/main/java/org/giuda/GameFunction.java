@@ -8,6 +8,7 @@ public class GameFunction {
 
     private static final String WORDS_FILE = "660000_parole_italiane.txt";
     private static final int MIN_LENGTH = 3;
+    private final boolean GOD_MODE = false; // Imposta a true per debug, false per gioco normale
 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
@@ -31,7 +32,9 @@ public class GameFunction {
         }
 
         // Scegli una parola casuale
-        String secret = words.get(new Random().nextInt(words.size())).toLowerCase();
+        String secret = "";
+        if(!GOD_MODE){secret = words.get(new Random().nextInt(words.size())).toLowerCase();}
+        else{secret = "acereti";} // Per debug, rimuovere in produzione
 
         // Chiedi il numero di tentativi
         int attempts = -1;
@@ -125,8 +128,20 @@ public class GameFunction {
 
         return new String(feedback);
     }
+    private void contaParole(){
+        int i = 3;
+        List<String> parole = loadWords(i);
+        while (!parole.isEmpty()) {
+            System.out.println("Parole di " + i + " lettere: " + parole.size());
+            i++;
+            parole = loadWords(i);
+        }
+    }
     public static void main(String[] args) {
         GameFunction game = new GameFunction();
+        System.out.println("INFORMAZIONI DI GIOCO");
+        System.out.println("--------------------------------------------------");
+        game.contaParole();
         game.startGame();
     }
 
