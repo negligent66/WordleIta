@@ -1,6 +1,6 @@
-#Wed Jul 09 16:28:08 CEST 2025
+#Wed Jul 09 16:58:46 CEST 2025
 cheat=7
 max_tentativi=2
 min_tentativi=2
-sconfitte=1
+sconfitte=2
 vittorie=1
