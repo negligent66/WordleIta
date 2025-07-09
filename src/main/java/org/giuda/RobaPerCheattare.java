@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.*;
 
 public class RobaPerCheattare {
+
+    private static final String STATS_FILE = "game_stats.txt";
+
     public void trovaParolePossibili() {
         Scanner scanner = new Scanner(System.in);
         List<String> tentativi = new ArrayList<>();
@@ -15,6 +18,9 @@ public class RobaPerCheattare {
             System.out.print("Inserisci la parola tentata (invio per uscire): ");
             String parola = scanner.nextLine().trim().toLowerCase();
             if (parola.isEmpty()) break;
+
+            incrementaCheat(); // Conta il cheating
+
             System.out.print("Inserisci la sequenza colori (G=Verde, Y=Giallo, W=Grigio): ");
             String col = scanner.nextLine().trim().toUpperCase();
             if (parola.length() != col.length()) {
@@ -24,7 +30,6 @@ public class RobaPerCheattare {
             tentativi.add(parola);
             colori.add(col);
 
-            // Carica parole solo la prima volta
             if (parolePossibili == null) {
                 parolePossibili = new ArrayList<>();
                 try (BufferedReader br = new BufferedReader(new FileReader("660000_parole_italiane.txt"))) {
@@ -41,14 +46,12 @@ public class RobaPerCheattare {
                 }
             }
 
-            // Filtra parole possibili con tutti i tentativi
             List<String> nuovePossibili = new ArrayList<>();
             for (String voc : parolePossibili) {
                 boolean ok = true;
                 for (int t = 0; t < tentativi.size(); t++) {
                     String tent = tentativi.get(t);
                     String colSeq = colori.get(t);
-                    // Verde e giallo
                     for (int i = 0; i < tent.length(); i++) {
                         char c = tent.charAt(i);
                         char v = voc.charAt(i);
@@ -66,7 +69,6 @@ public class RobaPerCheattare {
                         }
                     }
                     if (!ok) break;
-                    // Grigio
                     for (int i = 0; i < tent.length(); i++) {
                         char c = tent.charAt(i);
                         if (colSeq.charAt(i) == 'W') {
@@ -93,6 +95,28 @@ public class RobaPerCheattare {
                 System.out.println(p);
             }
             System.out.println();
+        }
+    }
+
+    private void incrementaCheat() {
+        Properties stats = new Properties();
+        File file = new File(STATS_FILE);
+
+        try {
+            if (file.exists()) {
+                try (FileReader reader = new FileReader(file)) {
+                    stats.load(reader);
+                }
+            }
+
+            int cheatCount = Integer.parseInt(stats.getProperty("cheat", "0"));
+            stats.setProperty("cheat", String.valueOf(cheatCount + 1));
+
+            try (FileWriter writer = new FileWriter(file)) {
+                stats.store(writer, null);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore aggiornamento cheat: " + e.getMessage());
         }
     }
 

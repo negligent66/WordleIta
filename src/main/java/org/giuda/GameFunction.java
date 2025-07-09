@@ -7,13 +7,13 @@ import java.util.*;
 public class GameFunction {
 
     private static final String WORDS_FILE = "660000_parole_italiane.txt";
+    private static final String STATS_FILE = "game_stats.txt";
     private static final int MIN_LENGTH = 3;
-    private final boolean GOD_MODE = false; // Imposta a true per debug, false per gioco normale
+    private final boolean GOD_MODE = false;
 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
 
-        // Chiedi la lunghezza della parola
         int wordLength = 0;
         while (wordLength < MIN_LENGTH) {
             System.out.print("Quante lettere deve avere la parola? (minimo " + MIN_LENGTH + "): ");
@@ -24,19 +24,14 @@ public class GameFunction {
             }
         }
 
-        // Carica le parole della lunghezza richiesta
         List<String> words = loadWords(wordLength);
         if (words.isEmpty()) {
             System.out.println("Nessuna parola trovata di " + wordLength + " lettere.");
             return;
         }
 
-        // Scegli una parola casuale
-        String secret = "";
-        if(!GOD_MODE){secret = words.get(new Random().nextInt(words.size())).toLowerCase();}
-        else{secret = "acereti";} // Per debug, rimuovere in produzione
+        String secret = !GOD_MODE ? words.get(new Random().nextInt(words.size())).toLowerCase() : "acereti";
 
-        // Chiedi il numero di tentativi
         int attempts = -1;
         while (attempts != 0 && attempts != 6) {
             System.out.print("modalità infinita(0) o classica(6): ");
@@ -45,7 +40,6 @@ public class GameFunction {
         }
         boolean infinite = attempts == 0;
 
-        // Inizia il gioco
         int tries = 0;
         boolean guessed = false;
         while (infinite || tries < attempts) {
@@ -71,8 +65,77 @@ public class GameFunction {
             }
             tries++;
         }
-        if (!guessed) {
+        if (!guessed){
             System.out.println("Negraccio hai perso! La parola era: " + secret);
+        }
+
+        if (infinite) {
+            updateInfiniteStats(guessed, tries);
+        } else {
+            updateClassicStats(guessed);
+        }
+    }
+
+    private void updateClassicStats(boolean guessed) {
+        Properties stats = new Properties();
+        File file = new File(STATS_FILE);
+
+        try {
+            if (file.exists()) {
+                try (FileReader reader = new FileReader(file)) {
+                    stats.load(reader);
+                }
+            }
+
+            int wins = Integer.parseInt(stats.getProperty("vittorie", "0"));
+            int losses = Integer.parseInt(stats.getProperty("sconfitte", "0"));
+
+            if (guessed) wins++;
+            else losses++;
+
+            stats.setProperty("vittorie", String.valueOf(wins));
+            stats.setProperty("sconfitte", String.valueOf(losses));
+
+            try (FileWriter writer = new FileWriter(file)) {
+                stats.store(writer, null);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Errore salvataggio statistiche: " + e.getMessage());
+        }
+    }
+
+    private void updateInfiniteStats(boolean guessed, int tries) {
+        Properties stats = new Properties();
+        File file = new File(STATS_FILE);
+
+        try {
+            if (file.exists()) {
+                try (FileReader reader = new FileReader(file)) {
+                    stats.load(reader);
+                }
+            }
+
+            int min = Integer.parseInt(stats.getProperty("min_tentativi", String.valueOf(Integer.MAX_VALUE)));
+            int max = Integer.parseInt(stats.getProperty("max_tentativi", "0"));
+            int abbandoni = Integer.parseInt(stats.getProperty("abbandoni", "0"));
+
+            if (guessed) {
+                min = Math.min(min, tries);
+                max = Math.max(max, tries);
+                stats.setProperty("min_tentativi", String.valueOf(min == Integer.MAX_VALUE ? tries : min));
+                stats.setProperty("max_tentativi", String.valueOf(max));
+            } else {
+                abbandoni++;
+                stats.setProperty("abbandoni", String.valueOf(abbandoni));
+            }
+
+            try (FileWriter writer = new FileWriter(file)) {
+                stats.store(writer, null);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Errore salvataggio statistiche: " + e.getMessage());
         }
     }
 
@@ -92,13 +155,11 @@ public class GameFunction {
         return result;
     }
 
-    // Restituisce feedback stile Wordle: [G]reen, [Y]ellow, [W]hite
     String getFeedback(String secret, String guess) {
         char[] feedback = new char[secret.length()];
         boolean[] secretUsed = new boolean[secret.length()];
         boolean[] guessUsed = new boolean[secret.length()];
 
-        // Verde
         for (int i = 0; i < secret.length(); i++) {
             if (guess.charAt(i) == secret.charAt(i)) {
                 feedback[i] = 'G';
@@ -107,7 +168,6 @@ public class GameFunction {
             }
         }
 
-        // Giallo o bianco
         for (int i = 0; i < secret.length(); i++) {
             if (!guessUsed[i]) {
                 boolean found = false;
@@ -118,17 +178,13 @@ public class GameFunction {
                         break;
                     }
                 }
-                if (!found) {
-                    feedback[i] = 'W'; // Bianco
-                } else {
-                    feedback[i] = 'Y'; // Giallo
-                }
+                feedback[i] = found ? 'Y' : 'W';
             }
         }
-
         return new String(feedback);
     }
-    private void contaParole(){
+
+    private void contaParole() {
         int i = 3;
         List<String> parole = loadWords(i);
         while (!parole.isEmpty()) {
@@ -137,6 +193,7 @@ public class GameFunction {
             parole = loadWords(i);
         }
     }
+
     public static void main(String[] args) {
         GameFunction game = new GameFunction();
         System.out.println("INFORMAZIONI DI GIOCO");
@@ -144,5 +201,4 @@ public class GameFunction {
         game.contaParole();
         game.startGame();
     }
-
 }
