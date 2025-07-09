@@ -6,59 +6,96 @@ import java.util.*;
 public class RobaPerCheattare {
     public void trovaParolePossibili() {
         Scanner scanner = new Scanner(System.in);
+        List<String> tentativi = new ArrayList<>();
+        List<String> colori = new ArrayList<>();
+
+        List<String> parolePossibili = null;
+
         while (true) {
             System.out.print("Inserisci la parola tentata (invio per uscire): ");
             String parola = scanner.nextLine().trim().toLowerCase();
             if (parola.isEmpty()) break;
-            System.out.print("Inserisci la sequenza colori (V=Verde, G=Giallo, W=Grigio): ");
-            String colori = scanner.nextLine().trim().toUpperCase();
-            if (parola.length() != colori.length()) {
+            System.out.print("Inserisci la sequenza colori (G=Verde, Y=Giallo, W=Grigio): ");
+            String col = scanner.nextLine().trim().toUpperCase();
+            if (parola.length() != col.length()) {
                 System.out.println("Errore: la parola e la sequenza colori devono avere la stessa lunghezza.\n");
                 continue;
             }
-            List<String> possibili = new ArrayList<>();
-            try (BufferedReader br = new BufferedReader(new FileReader("660000_parole_italiane.txt"))) {
-                String linea;
-                while ((linea = br.readLine()) != null) {
-                    String voc = linea.trim().toLowerCase();
-                    if (voc.length() != parola.length()) continue;
-                    boolean ok = true;
-                    Set<Character> usate = new HashSet<>();
-                    for (int i = 0; i < parola.length(); i++) {
-                        char c = parola.charAt(i);
-                        char v = voc.charAt(i);
-                        char col = colori.charAt(i);
-                        if (col == 'G') { // Verde: deve essere uguale e in posizione giusta
-                            if (v != c) { ok = false; break; }
-                        } else if (col == 'Y') { // Giallo: deve essere presente ma NON in quella posizione
-                            if (v == c || !voc.contains(String.valueOf(c))) { ok = false; break; }
+            tentativi.add(parola);
+            colori.add(col);
+
+            // Carica parole solo la prima volta
+            if (parolePossibili == null) {
+                parolePossibili = new ArrayList<>();
+                try (BufferedReader br = new BufferedReader(new FileReader("660000_parole_italiane.txt"))) {
+                    String linea;
+                    while ((linea = br.readLine()) != null) {
+                        String voc = linea.trim().toLowerCase();
+                        if (voc.length() == parola.length()) {
+                            parolePossibili.add(voc);
                         }
                     }
-                    // Controllo lettere grigie (W): non devono apparire più volte di quante sono verdi/gialle
-                    for (int i = 0; i < parola.length(); i++) {
-                        char c = parola.charAt(i);
-                        if (colori.charAt(i) == 'W') {
+                } catch (IOException e) {
+                    System.out.println("Errore nella lettura del file vocabolario: " + e.getMessage());
+                    return;
+                }
+            }
+
+            // Filtra parole possibili con tutti i tentativi
+            List<String> nuovePossibili = new ArrayList<>();
+            for (String voc : parolePossibili) {
+                boolean ok = true;
+                for (int t = 0; t < tentativi.size(); t++) {
+                    String tent = tentativi.get(t);
+                    String colSeq = colori.get(t);
+                    // Verde e giallo
+                    for (int i = 0; i < tent.length(); i++) {
+                        char c = tent.charAt(i);
+                        char v = voc.charAt(i);
+                        char colChar = colSeq.charAt(i);
+                        if (colChar == 'G') {
+                            if (v != c) {
+                                ok = false;
+                                break;
+                            }
+                        } else if (colChar == 'Y') {
+                            if (v == c || !voc.contains(String.valueOf(c))) {
+                                ok = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (!ok) break;
+                    // Grigio
+                    for (int i = 0; i < tent.length(); i++) {
+                        char c = tent.charAt(i);
+                        if (colSeq.charAt(i) == 'W') {
                             int occorrenzeVerdeGiallo = 0, occorrenzeVoc = 0;
-                            for (int j = 0; j < parola.length(); j++) {
-                                if (parola.charAt(j) == c && (colori.charAt(j) == 'G' || colori.charAt(j) == 'Y')) occorrenzeVerdeGiallo++;
+                            for (int j = 0; j < tent.length(); j++) {
+                                if (tent.charAt(j) == c && (colSeq.charAt(j) == 'G' || colSeq.charAt(j) == 'Y'))
+                                    occorrenzeVerdeGiallo++;
                                 if (voc.charAt(j) == c) occorrenzeVoc++;
                             }
-                            if (occorrenzeVoc > occorrenzeVerdeGiallo) { ok = false; break; }
+                            if (occorrenzeVoc > occorrenzeVerdeGiallo) {
+                                ok = false;
+                                break;
+                            }
                         }
                     }
-                    if (ok) possibili.add(voc);
+                    if (!ok) break;
                 }
-            } catch (IOException e) {
-                System.out.println("Errore nella lettura del file vocabolario: " + e.getMessage());
-                continue;
+                if (ok) nuovePossibili.add(voc);
             }
+            parolePossibili = nuovePossibili;
+
             System.out.println("Parole possibili:");
-            for (String p : possibili) {
+            for (String p : parolePossibili) {
                 System.out.println(p);
             }
             System.out.println();
         }
     }
+
     public static void main(String[] args) {
         RobaPerCheattare cheattatore = new RobaPerCheattare();
         cheattatore.trovaParolePossibili();

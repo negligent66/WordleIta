@@ -89,7 +89,7 @@ public class GameFunction {
         return result;
     }
 
-    // Restituisce feedback stile Wordle: [G]iusta, [S]bagliata, [P]resente
+    // Restituisce feedback stile Wordle: [G]reen, [Y]ellow, [W]hite
     String getFeedback(String secret, String guess) {
         char[] feedback = new char[secret.length()];
         boolean[] secretUsed = new boolean[secret.length()];
