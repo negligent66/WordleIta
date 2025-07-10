@@ -288,13 +288,16 @@ public class GameGUI extends JFrame {
             return;
         }
         String feedback = new GameFunction().getFeedback(secret, guess);
+        System.out.println("Feedback: " + feedback);
         for (int i = 0; i < wordLength; i++) {
             char f = feedback.charAt(i);
             Color color = switch (f) {
                 case 'G' -> Color.GREEN;
                 case 'Y' -> Color.YELLOW;
-                default -> Color.WHITE;
+                case 'W' -> Color.WHITE;
+                default -> Color.LIGHT_GRAY;
             };
+            System.out.println("Colore per lettera " + i + ": " + color);
             classicBoxes[currentRow][i].setBackground(color);
             classicFields[currentRow][i].setEditable(false);
         }

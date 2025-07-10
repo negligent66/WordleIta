@@ -46,6 +46,11 @@ public class GameFunction {
             System.out.print("Tentativo " + (tries + 1) + ": ");
             String guess = scanner.nextLine().trim().toLowerCase();
 
+            if (guess.equals("exit")) {
+                System.out.println("Hai abbandonato la partita.");
+                updateInfiniteStats(false, tries);
+                return;
+            }
             if (guess.length() != wordLength) {
                 System.out.println("La parola deve essere di " + wordLength + " lettere.");
                 continue;
