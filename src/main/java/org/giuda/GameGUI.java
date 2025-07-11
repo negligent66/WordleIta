@@ -298,7 +298,7 @@ public class GameGUI extends JFrame {
                 default -> Color.LIGHT_GRAY;
             };
             System.out.println("Colore per lettera " + i + ": " + color);
-            classicBoxes[currentRow][i].setBackground(color);
+            classicFields[currentRow][i].setBackground(color);
             classicFields[currentRow][i].setEditable(false);
         }
         if (guess.equals(secret)) {
