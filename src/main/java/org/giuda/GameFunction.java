@@ -6,7 +6,7 @@ import java.util.*;
 
 public class GameFunction {
 
-    private static final String WORDS_FILE = "660000_parole_italiane.txt";
+    private static String WORDS_FILE = "660000_parole_italiane.txt";
     private static final String STATS_FILE = "game_stats.txt";
     private static final int MIN_LENGTH = 3;
     private final boolean GOD_MODE = false;
@@ -19,6 +19,9 @@ public class GameFunction {
             System.out.print("Quante lettere deve avere la parola? (minimo " + MIN_LENGTH + "): ");
             wordLength = scanner.nextInt();
             scanner.nextLine();
+            /*if(wordLength == 5) {
+                WORDS_FILE = "parole.txt";
+            }*/
             if (wordLength < MIN_LENGTH) {
                 System.out.println("La parola deve essere lunga almeno " + MIN_LENGTH + " lettere.");
             }

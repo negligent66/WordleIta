@@ -97,6 +97,7 @@ public class GameGUI extends JFrame {
             infiniteBoxesInput[i] = box;
             inputPanel.add(box);
         }
+        bindGuessKeys(infiniteFieldsInput, this::checkInfiniteWord);
         panel.add(inputPanel);
 
         // Bottoni
@@ -156,6 +157,9 @@ public class GameGUI extends JFrame {
             }
             rowsPanel.add(rowPanel);
         }
+        for (JTextField[] row : classicFields) {
+            bindGuessKeys(row, this::checkClassicWord);
+        }
         mainPanel.add(rowsPanel, BorderLayout.CENTER);
 
         // Bottone centrato
@@ -166,6 +170,38 @@ public class GameGUI extends JFrame {
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         return mainPanel;
+    }
+
+    private void bindGuessKeys(JTextField[] fields, Runnable submit) {
+        for (int i = 0; i < fields.length; i++) {
+            JTextField field = fields[i];
+            int previous = Math.max(0, i - 1);
+            int next = Math.min(fields.length - 1, i + 1);
+            InputMap inputMap = field.getInputMap(JComponent.WHEN_FOCUSED);
+            ActionMap actionMap = field.getActionMap();
+
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "previousLetter");
+            actionMap.put("previousLetter", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fields[previous].requestFocusInWindow();
+                }
+            });
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "nextLetter");
+            actionMap.put("nextLetter", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    fields[next].requestFocusInWindow();
+                }
+            });
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "submitGuess");
+            actionMap.put("submitGuess", new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    submit.run();
+                }
+            });
+        }
     }
 
     // Filtro per una sola lettera e passaggio automatico
